@@ -1,5 +1,5 @@
 {
-    "name": "your-name-here/Acl",
+    "name": "makville/cakephp-acl-plugin",
     "description": "Acl plugin for CakePHP",
     "type": "cakephp-plugin",
     "license": "MIT",
@@ -11,12 +11,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Acl\\": "src/"
+            "MakvilleAcl\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Acl\\Test\\": "tests/",
+            "MakvilleAcl\\Test\\": "tests/",
             "Cake\\Test\\": "vendor/cakephp/cakephp/tests/"
         }
     }
