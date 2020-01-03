@@ -1,5 +1,5 @@
 {
-    "name": "makville/Acl",
+    "name": "makville/cakephp-acl-plugin",
     "description": "Acl plugin for CakePHP",
     "type": "cakephp-plugin",
     "license": "MIT",
