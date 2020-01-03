@@ -5,7 +5,7 @@ namespace Acl\Controller\Component;
 use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
 use Cake\Event\Event;
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\TableLocator;
 
 /**
  * Rentable component
@@ -27,7 +27,9 @@ class RentableComponent extends Component {
             $controller = $event->subject();
             if ($controller->isRentable) {
                 //which connection to use
-                $userTable = TableRegistry::get('AclUsers', ['className' => 'Acl\Model\Table\AclUsersTable']);
+                $locator = new TableLocator();
+                $config = $locator->exists('MakvilleAcl.Users') ? [] : ['className' => 'MakvilleAcl\Model\Table\UsersTable'];
+                $userTable = TableRegistry::get('MakvilleAcl.Users', $config);
                 //get the user.
                 $dbName = '';
                 if ($this->request->session()->read('db_name') != '') {

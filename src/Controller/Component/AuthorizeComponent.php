@@ -6,7 +6,7 @@ use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
 use Cake\Utility\Inflector;
 
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\TableLocator;
 
 /**
  * Authorize component
@@ -33,7 +33,9 @@ class AuthorizeComponent extends Component {
     }
     
     public function isAuthorized ($user) {
-        $usersTable = TableRegistry::get('Users', ['className' => 'Acl\Model\Table\UsersTable']);
+        $locator = new TableLocator();
+        $config = $locator->exists('MakvilleAcl.Users') ? [] : ['className' => 'MakvilleAcl\Model\Table\UsersTable'];
+        $usersTable = $locator->get('MakvilleAcl.Users', $config);
         $userId = $user['id'];
         $action = $this->getAction();
         return $usersTable->isAuthorized($userId, $action);

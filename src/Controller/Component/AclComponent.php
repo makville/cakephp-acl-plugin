@@ -1,10 +1,10 @@
 <?php
 
-namespace Acl\Controller\Component;
+namespace MakvilleAcl\Controller\Component;
 
 use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
-use Cake\ORM\TableRegistry;
+use Cake\ORM\Locator\TableLocator;
 
 /**
  * Acl component
@@ -19,7 +19,9 @@ class AclComponent extends Component {
     protected $_defaultConfig = [];
 
     public function getUsers() {
-        $table = TableRegistry::get('Acl.Users');
+        $locator = new TableLocator();
+        $config = $locator->exists('MakvilleAcl.Users') ? [] : ['className' => 'MakvilleAcl\Model\Table\UsersTable'];
+        $table = $locator->get('MakvilleAcl.Users', $config);
         return $table->find()->contain(['UserProfiles']);
     }
 }
