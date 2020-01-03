@@ -1,5 +1,5 @@
 <?php
-namespace Acl\Model\Entity;
+namespace MakvilleAcl\Model\Entity;
 
 use Cake\ORM\Entity;
 

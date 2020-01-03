@@ -1,5 +1,5 @@
 <?php
-namespace Acl\Model\Table;
+namespace MakvilleAcl\Model\Table;
 
 use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;

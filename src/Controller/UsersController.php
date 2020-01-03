@@ -7,7 +7,7 @@ use Carbon\Carbon;
 use Cake\ORM\TableRegistry;
 
 /**
- * AclUsers Controller
+ * Users Controller
  *
  * @property \Acl\Model\Table\UsersTable $Users
  */
