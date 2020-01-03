@@ -1,8 +1,8 @@
 <?php
 
-namespace Acl\Controller;
+namespace MakvilleAcl\Controller;
 
-use Acl\Controller\AppController;
+use MakvilleAcl\Controller\AppController;
 use Carbon\Carbon;
 use Cake\ORM\TableRegistry;
 

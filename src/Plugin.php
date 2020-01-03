@@ -1,12 +1,14 @@
 <?php
 
-namespace Acl;
+namespace MakvilleAcl;
 
 use Cake\Core\BasePlugin;
 
 /**
  * Plugin for Acl
  */
-class Plugin extends BasePlugin
-{
+class Plugin extends BasePlugin {
+    public function initialize() {
+        
+    }
 }

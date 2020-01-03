@@ -1,6 +1,6 @@
 <?php
 
-namespace Acl\Model\Behavior;
+namespace MakvilleAcl\Model\Behavior;
 
 use Cake\ORM\Behavior;
 use Cake\ORM\Table;
