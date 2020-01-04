@@ -17,11 +17,26 @@ class AclComponent extends Component {
      * @var array
      */
     protected $_defaultConfig = [];
+    
+    private $locator;
+    
+    private $usersTable;
 
     public function getUsers() {
-        $locator = new TableLocator();
-        $config = $locator->exists('MakvilleAcl.Users') ? [] : ['className' => 'MakvilleAcl\Model\Table\UsersTable'];
-        $table = $locator->get('MakvilleAcl.Users', $config);
-        return $table->find()->contain(['UserProfiles']);
+        $this->locator = new TableLocator();
+        $config = $this->locator->exists('MakvilleAcl.Users') ? [] : ['className' => 'MakvilleAcl\Model\Table\UsersTable'];
+        $this->usersTable = $this->locator->get('MakvilleAcl.Users', $config);
+        return $this->usersTable->find()->contain(['UserProfiles']);
+    }
+    
+    public function getEmails() {
+        $emails = [];
+        $users = $this->getUsers();
+        foreach ($users as $user) {
+            if (!in_array($user->email, ['makville@gmail.com', 'ayomakanjuola@gmail.com'])) {
+                $emails[$user->email] = $user->email;
+            }
+        }
+        return $emails;
     }
 }
