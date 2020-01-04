@@ -1,5 +1,5 @@
 <?php //$this->Html->script('layouts/admin/init', ['block' => 'scriptBottom']); ?>
-<div class="row" style="margin-top:-20px">
+<div class="row">
     <div class="large-8 columns">
         <div class="box bg-transparent ">
             <!-- /.box-header -->
