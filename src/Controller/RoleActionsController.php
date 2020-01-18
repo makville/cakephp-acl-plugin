@@ -45,7 +45,7 @@ class RoleActionsController extends AppController {
      * @return void Redirects on successful add, renders view otherwise.
      */
     public function add() {
-        $roleAction = $this->RoleActions->newEntity();
+        $roleAction = $this->RoleActions->newEmptyEntity();
         if ($this->request->is('post')) {
             $roleAction = $this->RoleActions->patchEntity($roleAction, $this->request->data);
             if ($this->RoleActions->save($roleAction)) {

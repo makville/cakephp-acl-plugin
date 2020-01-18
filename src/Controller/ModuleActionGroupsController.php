@@ -45,7 +45,7 @@ class ModuleActionGroupsController extends AppController {
      * @return void Redirects on successful add, renders view otherwise.
      */
     public function add() {
-        $moduleActionGroup = $this->ModuleActionGroups->newEntity();
+        $moduleActionGroup = $this->ModuleActionGroups->newEmptyEntity();
         if ($this->request->is('post')) {
             $moduleActionGroup = $this->ModuleActionGroups->patchEntity($moduleActionGroup, $this->request->data);
             if ($this->ModuleActionGroups->save($moduleActionGroup)) {

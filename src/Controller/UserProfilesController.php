@@ -45,7 +45,7 @@ class UserProfilesController extends AppController {
      * @return void Redirects on successful add, renders view otherwise.
      */
     public function add() {
-        $userProfile = $this->UserProfiles->newEntity();
+        $userProfile = $this->UserProfiles->newEmptyEntity();
         if ($this->request->is('post')) {
             $userProfile = $this->UserProfiles->patchEntity($userProfile, $this->request->data);
             if ($this->UserProfiles->save($userProfile)) {

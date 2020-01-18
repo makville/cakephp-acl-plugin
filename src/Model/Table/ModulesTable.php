@@ -29,12 +29,12 @@ class ModulesTable extends Table {
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config) {
+    public function initialize(array $config): void {
         parent::initialize($config);
 
-        $this->table('modules');
-        $this->displayField('name');
-        $this->primaryKey('id');
+        $this->setTable('modules');
+        $this->setDisplayField('name');
+        $this->setPrimaryKey('id');
 
         $this->hasMany('ModuleActionGroups', [
             'foreignKey' => 'module_id',
@@ -52,7 +52,7 @@ class ModulesTable extends Table {
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator) {
+    public function validationDefault(Validator $validator): Validator {
         $validator
                 ->integer('id')
                 ->allowEmpty('id', 'create');

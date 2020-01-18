@@ -45,7 +45,7 @@ class UserRolesController extends AppController {
      * @return void Redirects on successful add, renders view otherwise.
      */
     public function add() {
-        $userRole = $this->UserRoles->newEntity();
+        $userRole = $this->UserRoles->newEmptyEntity();
         if ($this->request->is('post')) {
             $userRole = $this->UserRoles->patchEntity($userRole, $this->request->data);
             if ($this->UserRoles->save($userRole)) {

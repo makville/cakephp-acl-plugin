@@ -71,8 +71,8 @@ class UsersController extends AppController {
      * @return void Redirects on successful add, renders view otherwise.
      */
     public function signup() {
-        $this->viewBuilder()->layout('default');
-        $user = $this->Users->newEntity();
+        $this->viewBuilder()->setLayout('default');
+        $user = $this->Users->newEmptyEntity();
         if ($this->request->is('post')) {
             if ($this->Captcha->isValid()) {
                 $data = $this->request->data();
@@ -163,7 +163,7 @@ class UsersController extends AppController {
     }
 
     public function summary() {
-        $this->viewBuilder()->layout('ajax');
+        $this->viewBuilder()->setLayout('ajax');
         $registryTable = TableRegistry::get('Registry.Registries');
         $summary = $registryTable->userSummary(1, $this->request->session()->read('user_id'));
         $this->set(compact('summary'));
@@ -195,7 +195,7 @@ class UsersController extends AppController {
     }
 
     public function approve($email, $code) {
-        $this->viewBuilder()->layout('default');
+        $this->viewBuilder()->setLayout('default');
         if ($this->Users->isValidCode($email, $code)) {
             $user = $this->Users->find()->where(['email' => $email])->contain(['UserProfiles'])->first();
             $user->code = $this->Users->generateToken();
@@ -222,7 +222,7 @@ class UsersController extends AppController {
     }
 
     public function login($status = null) {
-        $this->viewBuilder()->layout('default');
+        $this->viewBuilder()->setLayout('default');
         if ($this->request->is('post')) {
             if ($this->Users->isActivated($this->request->data['username'])) {
                 $user = $this->Auth->identify();
@@ -245,7 +245,7 @@ class UsersController extends AppController {
     }
 
     public function token($email) {
-        $this->viewBuilder()->layout('default');
+        $this->viewBuilder()->setLayout('default');
         if ($this->request->is('post')) {
             $user = $this->Users->getUser($this->request->data('email'))->toArray();
             if (!isset($this->request->data['token'])) {
@@ -271,7 +271,7 @@ class UsersController extends AppController {
     }
 
     public function recover($status = null) {
-        $this->viewBuilder()->layout('default');
+        $this->viewBuilder()->setLayout('default');
         if ($this->request->is('post')) {
             if ($this->Users->isValidEmail($this->request->data['email'])) {
                 $user = $this->Users->getUser($this->request->data['email']);
@@ -308,7 +308,7 @@ class UsersController extends AppController {
     }
 
     public function reset($email, $code, $type) {
-        $this->viewBuilder()->layout('default');
+        $this->viewBuilder()->setLayout('default');
         if ($this->request->is('post')) {
             if ($this->request->data['password'] != '' && ($this->request->data['password'] == $this->request->data['password2'])) {
                 if ($this->Users->reset($this->request->data['email'], $this->request->data['code'], $this->request->data['password'])) {
@@ -339,7 +339,7 @@ class UsersController extends AppController {
     }
 
     public function changepassword($status = null) {
-        $this->viewBuilder()->layout('default');
+        $this->viewBuilder()->setLayout('default');
         if ($this->request->is('post')) {
             if ($this->request->data['new_password'] != '' && ($this->request->data['new_password'] == $this->request->data['new_password2'])) {
                 if ($this->Auth->identify()) {
@@ -408,12 +408,12 @@ class UsersController extends AppController {
     }
 
     public function error($type) {
-        $this->viewBuilder()->layout('default');
+        $this->viewBuilder()->setLayout('default');
         $this->set(compact('type'));
     }
 
     public function success($type) {
-        $this->viewBuilder()->layout('default');
+        $this->viewBuilder()->setLayout('default');
         $this->set(compact('type'));
     }
 

@@ -45,7 +45,7 @@ class ModuleActionsController extends AppController {
      * @return void Redirects on successful add, renders view otherwise.
      */
     public function add() {
-        $moduleAction = $this->ModuleActions->newEntity();
+        $moduleAction = $this->ModuleActions->newEmptyEntity();
         if ($this->request->is('post')) {
             $moduleAction = $this->ModuleActions->patchEntity($moduleAction, $this->request->data);
             if ($this->ModuleActions->save($moduleAction)) {

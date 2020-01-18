@@ -42,7 +42,7 @@ class RolesController extends AppController {
      * @return void Redirects on successful add, renders view otherwise.
      */
     public function add() {
-        $role = $this->Roles->newEntity();
+        $role = $this->Roles->newEmptyEntity();
         if ($this->request->is('post')) {
             $data = $this->request->data['roles'];
             $role = $this->Roles->patchEntity($role, $data);
