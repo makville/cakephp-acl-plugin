@@ -1,27 +1,35 @@
-<?php /**/ ?>
-<div class="actions columns large-2 medium-3">
-    <h3><?= __('Actions') ?></h3>
-    <ul class="side-nav">
-        <li><?= $this->Form->postLink(
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var \Cake\Datasource\EntityInterface $module
+ */
+?>
+<div class="row">
+    <aside class="column">
+        <div class="side-nav">
+            <h4 class="heading"><?= __('Actions') ?></h4>
+            <?= $this->Form->postLink(
                 __('Delete'),
-                ['action' => 'delete', $aclModule->id],
-                ['confirm' => __('Are you sure you want to delete # {0}?', $aclModule->id)]
-            )
-        ?></li>
-        <li><?= $this->Html->link(__('List Acl Modules'), ['action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('List Acl Module Action Groups'), ['controller' => 'AclModuleActionGroups', 'action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('New Acl Module Action Group'), ['controller' => 'AclModuleActionGroups', 'action' => 'add']) ?></li>
-    </ul>
-</div>
-<div class="aclModules form large-10 medium-9 columns">
-    <?= $this->Form->create($aclModule) ?>
-    <fieldset>
-        <legend><?= __('Edit Acl Module') ?></legend>
-        <?php
-            echo $this->Form->input('name');
-            echo $this->Form->input('handle');
-        ?>
-    </fieldset>
-    <?= $this->Form->button(__('Submit')) ?>
-    <?= $this->Form->end() ?>
+                ['action' => 'delete', $module->id],
+                ['confirm' => __('Are you sure you want to delete # {0}?', $module->id), 'class' => 'side-nav-item']
+            ) ?>
+            <?= $this->Html->link(__('List Modules'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+        </div>
+    </aside>
+    <div class="column-responsive column-80">
+        <div class="modules form content">
+            <?= $this->Form->create($module) ?>
+            <fieldset>
+                <legend><?= __('Edit Module') ?></legend>
+                <?php
+                    echo $this->Form->control('name');
+                    echo $this->Form->control('description');
+                    echo $this->Form->control('is_system');
+                    echo $this->Form->control('is_public');
+                ?>
+            </fieldset>
+            <?= $this->Form->button(__('Submit')) ?>
+            <?= $this->Form->end() ?>
+        </div>
+    </div>
 </div>

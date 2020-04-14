@@ -1,0 +1,15 @@
+{
+    "name": "Access Control Layer",
+    "version": "1.0.0",
+    "description": "Controls authentication and authorization",
+    "duties": {
+        "Invite users": [
+            "MakvilleAcl.Users.invite",
+            "MakvilleAcl.Users.index"
+        ],
+        "Delete users": [
+            "MakvilleAcl.Users.delete",
+            "MakvilleAcl.Users.index"
+        ]
+    }
+}

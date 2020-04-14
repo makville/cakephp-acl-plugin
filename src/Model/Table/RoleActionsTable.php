@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace MakvilleAcl\Model\Table;
 
 use Cake\ORM\Query;
@@ -9,22 +11,22 @@ use Cake\Validation\Validator;
 /**
  * RoleActions Model
  *
- * @property \Cake\ORM\Association\BelongsTo $Roles
- * @property \Cake\ORM\Association\BelongsTo $ModuleActions
+ * @property \MakvilleAcl\Model\Table\RolesTable&\Cake\ORM\Association\BelongsTo $Roles
+ * @property \MakvilleAcl\Model\Table\ModuleActionsTable&\Cake\ORM\Association\BelongsTo $ModuleActions
  *
- * @method \Acl\Model\Entity\RoleAction get($primaryKey, $options = [])
- * @method \Acl\Model\Entity\RoleAction newEntity($data = null, array $options = [])
- * @method \Acl\Model\Entity\RoleAction[] newEntities(array $data, array $options = [])
- * @method \Acl\Model\Entity\RoleAction|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Acl\Model\Entity\RoleAction patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \Acl\Model\Entity\RoleAction[] patchEntities($entities, array $data, array $options = [])
- * @method \Acl\Model\Entity\RoleAction findOrCreate($search, callable $callback = null)
+ * @method \MakvilleAcl\Model\Entity\RoleAction get($primaryKey, $options = [])
+ * @method \MakvilleAcl\Model\Entity\RoleAction newEntity($data = null, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\RoleAction[] newEntities(array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\RoleAction|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\RoleAction saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\RoleAction patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\RoleAction[] patchEntities($entities, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\RoleAction findOrCreate($search, callable $callback = null, $options = [])
  *
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class RoleActionsTable extends Table
 {
-
     /**
      * Initialize method
      *
@@ -43,11 +45,11 @@ class RoleActionsTable extends Table
 
         $this->belongsTo('Roles', [
             'foreignKey' => 'role_id',
-            'className' => 'Acl.Roles'
+            'className' => 'MakvilleAcl.Roles',
         ]);
         $this->belongsTo('ModuleActions', [
             'foreignKey' => 'module_action_id',
-            'className' => 'Acl.ModuleActions'
+            'className' => 'MakvilleAcl.ModuleActions',
         ]);
     }
 
@@ -61,11 +63,11 @@ class RoleActionsTable extends Table
     {
         $validator
             ->integer('id')
-            ->allowEmpty('id', 'create');
+            ->allowEmptyString('id', null, 'create');
 
         $validator
             ->integer('assigned_by')
-            ->allowEmpty('assigned_by');
+            ->allowEmptyString('assigned_by');
 
         return $validator;
     }

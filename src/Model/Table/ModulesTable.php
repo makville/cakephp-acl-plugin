@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace MakvilleAcl\Model\Table;
 
 use Cake\ORM\Query;
@@ -10,16 +12,18 @@ use Cake\Validation\Validator;
 /**
  * Modules Model
  *
- * @property \Cake\ORM\Association\HasMany $ModuleActionGroups
- * @property \Cake\ORM\Association\HasMany $ModuleActions
+ * @property \MakvilleAcl\Model\Table\ModuleActionsTable&\Cake\ORM\Association\HasMany $ModuleActions
  *
- * @method \Acl\Model\Entity\Module get($primaryKey, $options = [])
- * @method \Acl\Model\Entity\Module newEntity($data = null, array $options = [])
- * @method \Acl\Model\Entity\Module[] newEntities(array $data, array $options = [])
- * @method \Acl\Model\Entity\Module|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Acl\Model\Entity\Module patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \Acl\Model\Entity\Module[] patchEntities($entities, array $data, array $options = [])
- * @method \Acl\Model\Entity\Module findOrCreate($search, callable $callback = null)
+ * @method \MakvilleAcl\Model\Entity\Module get($primaryKey, $options = [])
+ * @method \MakvilleAcl\Model\Entity\Module newEntity($data = null, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\Module[] newEntities(array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\Module|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\Module saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\Module patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\Module[] patchEntities($entities, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\Module findOrCreate($search, callable $callback = null, $options = [])
+ *
+ * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
 class ModulesTable extends Table {
 
@@ -36,13 +40,15 @@ class ModulesTable extends Table {
         $this->setDisplayField('name');
         $this->setPrimaryKey('id');
 
-        $this->hasMany('ModuleActionGroups', [
+        $this->addBehavior('Timestamp');
+
+        $this->hasMany('Duties', [
             'foreignKey' => 'module_id',
-            'className' => 'Acl.ModuleActionGroups'
+            'className' => 'MakvilleAcl.Duties',
         ]);
         $this->hasMany('ModuleActions', [
             'foreignKey' => 'module_id',
-            'className' => 'Acl.ModuleActions'
+            'className' => 'MakvilleAcl.ModuleActions',
         ]);
     }
 
@@ -55,87 +61,61 @@ class ModulesTable extends Table {
     public function validationDefault(Validator $validator): Validator {
         $validator
                 ->integer('id')
-                ->allowEmpty('id', 'create');
+                ->allowEmptyString('id', null, 'create');
 
         $validator
-                ->allowEmpty('name');
+                ->scalar('name')
+                ->maxLength('name', 255)
+                ->allowEmptyString('name');
 
         $validator
-                ->allowEmpty('description');
+                ->scalar('description')
+                ->maxLength('description', 255)
+                ->allowEmptyString('description');
 
         $validator
-                ->allowEmpty('is_system');
-
-        $validator
-                ->allowEmpty('is_public');
+                ->scalar('version')
+                ->maxLength('version', 255)
+                ->allowEmptyString('version');
 
         return $validator;
     }
 
-    public function isUnique($name, $isSystem, $signature) {
-        if ($this->find()->where(['name' => $name])->count() == 0) {
-            return true;
-        }
-        //confirm system status
-        $moduleEntity = $this->find()->where(['name' => $name])->first();
-        $moduleEntity->signature = $signature;
-        if ($moduleEntity->is_system != $isSystem) {
-            $moduleEntity->is_system = $isSystem;
-        }
-        $this->save($moduleEntity);
-        return false;
-    }
-
-    public function getModuleActionStructure() {
-        return $this->find()->contain(['ModuleActionGroups' => ['ModuleActions']]);
-    }
-
-    public function isSystem($path) {
-        $dir = new DirectoryIterator($path);
-        foreach ($dir as $file) {
-            if ($file->getFilename() == 'system') {
-                return true;
+    public function configure ($configuration) {
+        $duties = $configuration['duties'];
+        unset($configuration['duties']);
+        //Save the module
+        $module = $this->newEntity($configuration);
+        $this->save($module);
+        //save the duties
+        foreach ($duties as $dutyName => $actions) {
+            $duty = $this->Duties->newEntity([
+                'module_id' => $module->id,
+                'name' => $dutyName
+            ]);
+            $this->Duties->save($duty);
+            foreach ($actions as $actionName) {
+                $action = $this->Duties->ModuleActions->newEntity([
+                    'module_id' => $module->id,
+                    'duty_id' => $duty->id,
+                    'name' => $actionName
+                ]);
+                $this->Duties->ModuleActions->save($action);
             }
         }
-        return false;
     }
-
-    public function isPublic($path) {
-        $dir = new DirectoryIterator($path);
-        foreach ($dir as $file) {
-            if ($file->getFilename() == 'public') {
-                return true;
+    
+    public function remove ($id) {
+        $module = $this->get($id, ['contain' => ['Duties' => ['ModuleActions']]]);
+        foreach ($module->duties as $duty) {
+            foreach ($duty->module_actions as $action) {
+                //remove role actions
+                $this->Duties->ModuleActions->RoleActions->deleteAll(['module_action_id' => $action->id]);
+                //remove the action itself
+                $this->Duties->ModuleActions->delete($action);
             }
+            $this->Duties->delete($duty);
         }
-        return false;
+        return $this->delete($module);
     }
-
-    public function saveModule($module, $signature) {
-        $isSystem = 0;
-        if (!(strpos($module, '-system') === false)) {
-            $isSystem = 1;
-        }
-        $module = $this->reformatName($module);
-        if ($this->isUnique($module, $isSystem, $signature)) {
-            $moduleEntity = $this->newEntity(['name' => $module, 'handle' => strtolower($module), 'is_system' => $isSystem, 'signature' => $signature]);
-            $this->save($moduleEntity);
-        }
-        return $this->find()->where(['name' => $module])->first();
-    }
-
-    public function reformatName($name) {
-        if (strpos($name, '-system') === false) {
-            return $name;
-        }
-        return explode('-', $name)[0];
-    }
-
-    public function purge($signature) {
-        return $this->deleteAll([function($exp) use ($signature) {
-                        return $exp->not(['signature' => $signature]);
-                    }]
-                );
-            }
-
-        }
-        
+}

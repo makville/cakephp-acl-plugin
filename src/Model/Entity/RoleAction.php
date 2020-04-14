@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace MakvilleAcl\Model\Entity;
 
 use Cake\ORM\Entity;
@@ -7,20 +9,19 @@ use Cake\ORM\Entity;
  * RoleAction Entity
  *
  * @property int $id
- * @property int $role_id
- * @property int $module_action_id
- * @property int $assigned_by
- * @property \Cake\I18n\Time $created
- * @property \Cake\I18n\Time $modified
+ * @property int|null $role_id
+ * @property int|null $module_action_id
+ * @property int|null $assigned_by
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
  *
- * @property \Acl\Model\Entity\Role $role
- * @property \Acl\Model\Entity\ModuleAction $module_action
+ * @property \MakvilleAcl\Model\Entity\Role $role
+ * @property \MakvilleAcl\Model\Entity\ModuleAction $module_action
  */
 class RoleAction extends Entity
 {
-
     /**
-     * Fields that can be mass assigned using newEmptyEntity() or patchEntity().
+     * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * Note that when '*' is set to true, this allows all unspecified fields to
      * be mass assigned. For security purposes, it is advised to set '*' to false
@@ -29,7 +30,12 @@ class RoleAction extends Entity
      * @var array
      */
     protected $_accessible = [
-        '*' => true,
-        'id' => false
+        'role_id' => true,
+        'module_action_id' => true,
+        'assigned_by' => true,
+        'created' => true,
+        'modified' => true,
+        'role' => true,
+        'module_action' => true,
     ];
 }

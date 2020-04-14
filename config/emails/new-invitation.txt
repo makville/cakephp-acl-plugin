@@ -1,0 +1,13 @@
+You have received this email because an account was registered for you at %s.
+
+Email address: %s
+
+Your account is currently inactive.
+
+Click on the link below to activate your account and set a new password
+
+%s
+
+Regards,
+Web Administrator
+%s

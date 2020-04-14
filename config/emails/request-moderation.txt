@@ -1,0 +1,13 @@
+You have received this email because an account was registered at %s, which has been confirmed by the user but requires moderator approval
+
+Email address: %s
+
+The account is currently inactive as it is awaiting approval.
+
+Click on the link below to approve the account
+
+%s
+
+Regards,
+Web Administrator
+%s

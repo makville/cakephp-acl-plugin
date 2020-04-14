@@ -1,0 +1,13 @@
+You have received this email because an account was registered at %s, which has been approved by a moderator
+
+Email address: %s
+
+The account is currently now fully active.
+
+Click on the link below to login to the account
+
+%s
+
+Regards,
+Web Administrator
+%s

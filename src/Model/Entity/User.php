@@ -1,34 +1,34 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace MakvilleAcl\Model\Entity;
 
 use Cake\ORM\Entity;
-use Cake\Auth\DefaultPasswordHasher;
+use Authentication\PasswordHasher\DefaultPasswordHasher;
 
 /**
  * User Entity
  *
  * @property int $id
- * @property string $email
- * @property string $password
- * @property string $status
- * @property string $code
- * @property \Cake\I18n\Time $expiring
- * @property \Cake\I18n\Time $activated
- * @property string $is_system
- * @property string $is_global
- * @property string $db
- * @property string $owner
- * @property \Cake\I18n\Time $created
- * @property string $modified
+ * @property string|null $username
+ * @property string|null $email
+ * @property string|null $password
+ * @property string|null $status
+ * @property string|null $code
+ * @property \Cake\I18n\FrozenTime|null $expiring
+ * @property \Cake\I18n\FrozenTime|null $activated
+ * @property string|null $owner
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
  *
- * @property \Acl\Model\Entity\UserProfile[] $user_profiles
- * @property \Acl\Model\Entity\UserRole[] $user_roles
+ * @property \MakvilleAcl\Model\Entity\UserProfile[] $user_profiles
+ * @property \MakvilleAcl\Model\Entity\UserRole[] $user_roles
  */
 class User extends Entity {
 
     /**
-     * Fields that can be mass assigned using newEmptyEntity() or patchEntity().
+     * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * Note that when '*' is set to true, this allows all unspecified fields to
      * be mass assigned. For security purposes, it is advised to set '*' to false
@@ -37,8 +37,18 @@ class User extends Entity {
      * @var array
      */
     protected $_accessible = [
-        '*' => true,
-        'id' => false
+        'username' => true,
+        'email' => true,
+        'password' => true,
+        'status' => true,
+        'code' => true,
+        'expiring' => true,
+        'activated' => true,
+        'owner' => true,
+        'created' => true,
+        'modified' => true,
+        'user_profiles' => true,
+        'user_roles' => true,
     ];
 
     /**
@@ -47,11 +57,11 @@ class User extends Entity {
      * @var array
      */
     protected $_hidden = [
-        'password'
+        'password',
     ];
 
-    public function _setPassword($password) {
-        return (new DefaultPasswordHasher)->hash($password);
+    protected function _setPassword(string $password) {
+        $hasher = new DefaultPasswordHasher();
+        return $hasher->hash($password);
     }
-
 }

@@ -1,15 +1,18 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace MakvilleAcl\Controller\Component;
 
 use Cake\Controller\Component;
 use Cake\Controller\ComponentRegistry;
-use Cake\ORM\Locator\TableLocator;
 
 /**
  * Acl component
  */
 class AclComponent extends Component {
+
+    private $usersTable;
 
     /**
      * Default configuration.
@@ -17,26 +20,26 @@ class AclComponent extends Component {
      * @var array
      */
     protected $_defaultConfig = [];
-    
-    private $locator;
-    
-    private $usersTable;
 
-    public function getUsers() {
-        $this->locator = new TableLocator();
-        $config = $this->locator->exists('MakvilleAcl.Users') ? [] : ['className' => 'MakvilleAcl\Model\Table\UsersTable'];
-        $this->usersTable = $this->locator->get('MakvilleAcl.Users', $config);
-        return $this->usersTable->find()->contain(['UserProfiles']);
+    public function initialize(array $config): void {
+        parent::initialize($config);
+        $locator = \Cake\ORM\TableRegistry::getTableLocator();
+        $tableConfig = $locator->exists('MakvilleAcl.UsersTable') ? [] : ['className' => 'MakvilleAcl\Model\Table\UsersTable'];
+        $this->usersTable = $locator->get('MakvilleAcl.UsersTable', $tableConfig);
+    }
+
+    public function loadRoles($user) {
+        $this->_registry
+                ->getController()
+                ->getRequest()
+                ->getSession()
+                ->write('role', $this->usersTable->getRoles($user));
+    }
+
+    public function loadEmailMessage($event, $host, $email, $link) {
+        $format = file_exists(CONFIG . "emails/$event.txt") ? file_get_contents(CONFIG . "emails/$event.txt") : file_get_contents(\Cake\Core\Plugin::configPath('MakvilleAcl') . "emails/$event.txt");
+        $message = sprintf($format, $host, $email, $link, $host);
+        return $message;
     }
     
-    public function getEmails() {
-        $emails = [];
-        $users = $this->getUsers();
-        foreach ($users as $user) {
-            if (!in_array($user->email, ['makville@gmail.com', 'ayomakanjuola@gmail.com'])) {
-                $emails[$user->email] = $user->email;
-            }
-        }
-        return $emails;
-    }
 }

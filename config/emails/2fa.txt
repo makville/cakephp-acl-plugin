@@ -1,0 +1,11 @@
+You have received this email because you attempted to login into your account at %s.
+
+Email address: %s
+
+Use the token below to complete your login
+
+%s
+
+Regards,
+Web Administrator
+%s

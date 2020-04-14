@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MakvilleAcl\Model\Table;
 
@@ -10,27 +11,29 @@ use Cake\Validation\Validator;
 /**
  * ModuleActions Model
  *
- * @property \Cake\ORM\Association\BelongsTo $Modules
- * @property \Cake\ORM\Association\BelongsTo $ModuleActionGroups
- * @property \Cake\ORM\Association\HasMany $RoleActions
+ * @property \MakvilleAcl\Model\Table\ModulesTable&\Cake\ORM\Association\BelongsTo $Modules
+ * @property \MakvilleAcl\Model\Table\DutiesTable&\Cake\ORM\Association\BelongsTo $Duties
+ * @property \MakvilleAcl\Model\Table\RoleActionsTable&\Cake\ORM\Association\HasMany $RoleActions
  *
- * @method \Acl\Model\Entity\ModuleAction get($primaryKey, $options = [])
- * @method \Acl\Model\Entity\ModuleAction newEntity($data = null, array $options = [])
- * @method \Acl\Model\Entity\ModuleAction[] newEntities(array $data, array $options = [])
- * @method \Acl\Model\Entity\ModuleAction|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Acl\Model\Entity\ModuleAction patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \Acl\Model\Entity\ModuleAction[] patchEntities($entities, array $data, array $options = [])
- * @method \Acl\Model\Entity\ModuleAction findOrCreate($search, callable $callback = null)
+ * @method \MakvilleAcl\Model\Entity\ModuleAction get($primaryKey, $options = [])
+ * @method \MakvilleAcl\Model\Entity\ModuleAction newEntity($data = null, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\ModuleAction[] newEntities(array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\ModuleAction|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\ModuleAction saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\ModuleAction patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\ModuleAction[] patchEntities($entities, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\ModuleAction findOrCreate($search, callable $callback = null, $options = [])
  */
-class ModuleActionsTable extends Table {
-
+class ModuleActionsTable extends Table
+{
     /**
      * Initialize method
      *
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config): void {
+    public function initialize(array $config): void
+    {
         parent::initialize($config);
 
         $this->setTable('module_actions');
@@ -39,15 +42,15 @@ class ModuleActionsTable extends Table {
 
         $this->belongsTo('Modules', [
             'foreignKey' => 'module_id',
-            'className' => 'Acl.Modules'
+            'className' => 'MakvilleAcl.Modules',
         ]);
-        $this->belongsTo('ModuleActionGroups', [
-            'foreignKey' => 'module_action_group_id',
-            'className' => 'Acl.ModuleActionGroups'
+        $this->belongsTo('Duties', [
+            'foreignKey' => 'duty_id',
+            'className' => 'MakvilleAcl.Duties',
         ]);
         $this->hasMany('RoleActions', [
             'foreignKey' => 'module_action_id',
-            'className' => 'Acl.RoleActions'
+            'className' => 'MakvilleAcl.RoleActions',
         ]);
     }
 
@@ -57,28 +60,30 @@ class ModuleActionsTable extends Table {
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator): Validator {
+    public function validationDefault(Validator $validator): Validator
+    {
         $validator
-                ->integer('id')
-                ->allowEmpty('id', 'create');
+            ->integer('id')
+            ->allowEmptyString('id', null, 'create');
 
         $validator
-                ->allowEmpty('name');
+            ->scalar('name')
+            ->maxLength('name', 255)
+            ->allowEmptyString('name');
 
         $validator
-                ->allowEmpty('description');
+            ->scalar('description')
+            ->maxLength('description', 255)
+            ->allowEmptyString('description');
 
         $validator
-                ->allowEmpty('handle');
+            ->scalar('handle')
+            ->maxLength('handle', 255)
+            ->allowEmptyString('handle');
 
         $validator
-                ->allowEmpty('is_system');
-
-        $validator
-                ->allowEmpty('is_public');
-
-        $validator
-                ->allowEmpty('ownership_check');
+            ->scalar('ownership_check')
+            ->allowEmptyString('ownership_check');
 
         return $validator;
     }
@@ -90,72 +95,11 @@ class ModuleActionsTable extends Table {
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules): RulesChecker {
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
         $rules->add($rules->existsIn(['module_id'], 'Modules'));
-        $rules->add($rules->existsIn(['module_action_group_id'], 'ModuleActionGroups'));
+        $rules->add($rules->existsIn(['duty_id'], 'Duties'));
 
         return $rules;
     }
-
-    public function isUnique($moduleId, $groupId, $action, $signature) {
-        $ownership = 0;
-        if ($action['has_ownership']) {
-            $ownership = 1;
-        }
-        $isSystem = 0;
-        if ($action['is_system']) {
-            $isSystem = 1;
-        }
-        $isPublic = 0;
-        if ($action['is_public']) {
-            $isPublic = 1;
-        }
-        if ($this->find()->where(['module_id' => $moduleId, 'module_action_group_id' => $groupId, 'name' => $action['name']])->count() == 0) {
-            return true;
-        }
-        //confirm if it has ownership and system status
-        $actionEntity = $this->find()->where(['module_id' => $moduleId, 'module_action_group_id' => $groupId, 'name' => $action['name']])->first();
-        $actionEntity->signature = $signature;
-        if ($actionEntity->ownership_check != $ownership) {
-            $actionEntity->ownership_check = $ownership;
-        }
-        if ($actionEntity->is_system != $isSystem) {
-            $actionEntity->is_system = $isSystem;
-        }
-        if ($actionEntity->is_public != $isPublic) {
-            $actionEntity->is_public = $isPublic;
-        }
-        $this->save($actionEntity);
-        return false;
-    }
-
-    public function hasOwnershipCheck($path) {
-        if (strpos(substr(file_get_contents($path), 0, 100), 'OwnershipCheck = true') === false) {
-            return false;
-        }
-        return true;
-    }
-
-    public function isSystem($path) {
-        if (strpos(substr(file_get_contents($path), 0, 100), 'IsSystem = true') === false) {
-            return false;
-        }
-        return true;
-    }
-
-    public function isPublic($path) {
-        if (strpos(substr(file_get_contents($path), 0, 100), 'IsPublic = true') === false) {
-            return false;
-        }
-        return true;
-    }
-
-    public function purge($signature) {
-        return $this->deleteAll([function($exp) use ($signature) {
-                        return $exp->not(['signature' => $signature]);
-                    }]
-                );
-            }
-
-        }
-        
+}

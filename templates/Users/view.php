@@ -1,40 +1,69 @@
-<?php/**/ ?>
-<div class="tab-content profile-page">
-    <!-- PROFILE TAB CONTENT -->
-    <div class="tab-pane profile active" id="profile-tab">
-        <div class="row">
-            <div class="col-md-3">
-                <div class="user-info-left">
-                    <img src="assets/img/profile-avatar.png" alt="Profile Picture">
-                    <h2><?= $aclUser->email; ?> <i class="fa fa-circle green-font online-icon"></i><sup class="sr-only">online</sup></h2>
-                    <div class="contact">
-                        <p><a href="page-profile.html#" class="btn btn-block btn-custom-primary"><i class="fa fa-envelope-o"></i> Send Message</a></p>
-                        <?= $this->Form->postLink(__(($aclUser->status == 'active') ? 'Inactivate' : 'Activate'), ['action' => 'toggle', $aclUser->id], ['class' => 'btn btn-block btn-warning'], ['confirm' => __('Are you sure you want to change this users\'s status?' )]) ?>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-9">
-                <div class="user-info-right">
-                    <div class="basic-info">
-                        <h3><i class="fa fa-square"></i> Basic Information</h3>
-                        <p class="data-row">
-                            <span class="data-name">Status</span>
-                            <span class="data-value"><?= $aclUser->status; ?></span>
-                        </p>
-                        <p class="data-row">
-                            <span class="data-name">Registered</span>
-                            <span class="data-value"><?= $this->Time->format($aclUser->created, 'd/M/Y');?></span>
-                        </p>
-                    </div>
-                    <div class="about">
-                        <h3><i class="fa fa-square"></i> Privileges | <em><?= $this->Html->link('Edit', ['plugin' => 'acl', 'controller' => 'acl_users', 'action' => 'privileges', $aclUser->id], ['class' => '']);?></em></h3>
-                        <ul>
-                        <?php foreach ($aclUser->acl_user_roles as $userRoles): ?>
-                            <li><?= $userRoles->acl_role->name;?></li>
-                        <?php endforeach; ?>
+<?php
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+?>
+<div class="row">
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="card-body">
+                <h5 class="card-title">User Account</h5>
+                <hr />
+                <ul class="list-group">
+                    <?php if (\Cake\Core\Configure::read('makville-acl-use-username')): ?>
+                        <li class="list-group-item">
+                            <h6 class="list-group-item-heading">Username</h6>
+                            <p class="list-group-item-text"><?= $user->username; ?></p>
+                        </li>
+                    <?php endif; ?>
+                    <li class="list-group-item">
+                        <h6 class="list-group-item-heading">Email address</h6>
+                        <p class="list-group-item-text"><?= $user->email; ?></p>
+                    </li>
+                </ul>
+                <p></p>
+                <ol class="breadcrumb">
+                    <li class="active breadcrumb-item" aria-current="page">Profile</li>
+                </ol>
+                <ul class="list-group">
+                    <?php foreach ($user->user_profiles as $profile): ?>
+                        <li class="list-group-item">
+                            <h6 class="list-group-item-heading"><?= $profileFields[$profile->user_profile_field_id]; ?></h6>
+                            <p class="list-group-item-text"><?= $profile->value; ?></p>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+                <p></p>
+                <ol class="breadcrumb">
+                    <li class="active breadcrumb-item" aria-current="page">Roles</li>
+                </ol>
+                <?= $this->Form->create(null, ['class' => 'pull-left']); ?>
+                <div class="scroll-area-lg">
+                    <div class="scrollbar-container ps--active-y ps">
+                        <ul class="list-group" style="list-style: none;">
+                            <?php foreach ($roles as $role): ?>
+                                <li class="list-group-item">
+                                    <div class="position-relative form-check">
+                                        <label class="form-check-label">
+                                            <?= $this->Form->input('roles[]', ['type' => 'checkbox', 'class' => 'form-check-input', 'value' => $role->id, 'checked' => in_array($role->id, $userRoles) ? true : false]); ?>
+                                            <?= $role->name; ?>
+                                        </label>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
                         </ul>
                     </div>
                 </div>
+                <?= $this->Form->submit(__('Update roles'), ['class' => 'btn btn-success pull-right']); ?>
+                <span class="pull-right">&nbsp;</span>
+                <span class="pull-right">&nbsp;</span>
+                <?= $this->Form->end(); ?>
+                <?= $this->Form->postLink('Delete', ['plugin' => 'MakvilleAcl', 'controller' => 'Users', 'action' => 'delete', $user->id], ['class' => 'btn btn-danger pull-left', 'confirm' => 'Are you sure you want to delete this account']); ?>
+                <span class="pull-right">&nbsp;</span>
+                <span class="pull-right">&nbsp;</span>
+                <?= $this->Form->postLink('Deactivate', ['plugin' => 'MakvilleAcl', 'controller' => 'Users', 'action' => 'deactivate', $user->id], ['class' => 'btn btn-warning pull-left', 'confirm' => 'Are you sure you want to deactivate this account']); ?>
             </div>
         </div>
     </div>

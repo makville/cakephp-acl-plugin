@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace MakvilleAcl\Model\Entity;
 
 use Cake\ORM\Entity;
@@ -7,19 +9,18 @@ use Cake\ORM\Entity;
  * Role Entity
  *
  * @property int $id
- * @property string $name
- * @property string $description
- * @property \Cake\I18n\Time $created
- * @property \Cake\I18n\Time $modified
+ * @property string|null $name
+ * @property string|null $description
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
  *
- * @property \Acl\Model\Entity\RoleAction[] $role_actions
- * @property \Acl\Model\Entity\UserRole[] $user_roles
+ * @property \MakvilleAcl\Model\Entity\RoleAction[] $role_actions
+ * @property \MakvilleAcl\Model\Entity\UserRole[] $user_roles
  */
 class Role extends Entity
 {
-
     /**
-     * Fields that can be mass assigned using newEmptyEntity() or patchEntity().
+     * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * Note that when '*' is set to true, this allows all unspecified fields to
      * be mass assigned. For security purposes, it is advised to set '*' to false
@@ -28,7 +29,11 @@ class Role extends Entity
      * @var array
      */
     protected $_accessible = [
-        '*' => true,
-        'id' => false
+        'name' => true,
+        'description' => true,
+        'created' => true,
+        'modified' => true,
+        'role_actions' => true,
+        'user_roles' => true,
     ];
 }

@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace MakvilleAcl\Model\Entity;
 
 use Cake\ORM\Entity;
@@ -7,20 +9,19 @@ use Cake\ORM\Entity;
  * UserRole Entity
  *
  * @property int $id
- * @property int $user_id
- * @property int $role_id
- * @property int $assigned_by
- * @property \Cake\I18n\Time $created
- * @property \Cake\I18n\Time $modified
+ * @property int|null $user_id
+ * @property int|null $role_id
+ * @property int|null $assigned_by
+ * @property \Cake\I18n\FrozenTime|null $created
+ * @property \Cake\I18n\FrozenTime|null $modified
  *
- * @property \Acl\Model\Entity\User $user
- * @property \Acl\Model\Entity\Role $role
+ * @property \MakvilleAcl\Model\Entity\User $user
+ * @property \MakvilleAcl\Model\Entity\Role $role
  */
 class UserRole extends Entity
 {
-
     /**
-     * Fields that can be mass assigned using newEmptyEntity() or patchEntity().
+     * Fields that can be mass assigned using newEntity() or patchEntity().
      *
      * Note that when '*' is set to true, this allows all unspecified fields to
      * be mass assigned. For security purposes, it is advised to set '*' to false
@@ -29,7 +30,12 @@ class UserRole extends Entity
      * @var array
      */
     protected $_accessible = [
-        '*' => true,
-        'id' => false
+        'user_id' => true,
+        'role_id' => true,
+        'assigned_by' => true,
+        'created' => true,
+        'modified' => true,
+        'user' => true,
+        'role' => true,
     ];
 }

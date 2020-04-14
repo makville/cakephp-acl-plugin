@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MakvilleAcl\Model\Table;
 
@@ -10,34 +11,46 @@ use Cake\Validation\Validator;
 /**
  * UserProfiles Model
  *
- * @property \Cake\ORM\Association\BelongsTo $Users
+ * @property \MakvilleAcl\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
+ * @property \MakvilleAcl\Model\Table\UserProfileFieldsTable&\Cake\ORM\Association\BelongsTo $UserProfileFields
  *
- * @method \Acl\Model\Entity\UserProfile get($primaryKey, $options = [])
- * @method \Acl\Model\Entity\UserProfile newEntity($data = null, array $options = [])
- * @method \Acl\Model\Entity\UserProfile[] newEntities(array $data, array $options = [])
- * @method \Acl\Model\Entity\UserProfile|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Acl\Model\Entity\UserProfile patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \Acl\Model\Entity\UserProfile[] patchEntities($entities, array $data, array $options = [])
- * @method \Acl\Model\Entity\UserProfile findOrCreate($search, callable $callback = null)
+ * @method \MakvilleAcl\Model\Entity\UserProfile get($primaryKey, $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserProfile newEntity($data = null, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserProfile[] newEntities(array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserProfile|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserProfile saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserProfile patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserProfile[] patchEntities($entities, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserProfile findOrCreate($search, callable $callback = null, $options = [])
+ *
+ * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
-class UserProfilesTable extends Table {
-
+class UserProfilesTable extends Table
+{
     /**
      * Initialize method
      *
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config): void {
+    public function initialize(array $config): void
+    {
         parent::initialize($config);
 
         $this->setTable('user_profiles');
-        $this->setDisplayField('name');
+        $this->setDisplayField('id');
         $this->setPrimaryKey('id');
+
+        $this->addBehavior('Timestamp');
 
         $this->belongsTo('Users', [
             'foreignKey' => 'user_id',
-            'className' => 'Acl.Users'
+            'className' => 'MakvilleAcl.Users',
+        ]);
+        $this->belongsTo('UserProfileFields', [
+            'foreignKey' => 'user_profile_field_id',
+            'joinType' => 'INNER',
+            'className' => 'MakvilleAcl.UserProfileFields',
         ]);
     }
 
@@ -47,13 +60,15 @@ class UserProfilesTable extends Table {
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator): Validator {
+    public function validationDefault(Validator $validator): Validator
+    {
         $validator
-                ->integer('id')
-                ->allowEmpty('id', 'create');
+            ->integer('id')
+            ->allowEmptyString('id', null, 'create');
 
         $validator
-                ->allowEmpty('name');
+            ->scalar('value')
+            ->allowEmptyString('value');
 
         return $validator;
     }
@@ -65,29 +80,11 @@ class UserProfilesTable extends Table {
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules): RulesChecker {
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
         $rules->add($rules->existsIn(['user_id'], 'Users'));
+        $rules->add($rules->existsIn(['user_profile_field_id'], 'UserProfileFields'));
 
         return $rules;
     }
-
-    public function userHasProfile($userId) {
-        if ($this->find()->where(['user_id' => $userId])->count() == 1) {
-            return true;
-        }
-        return false;
-    }
-
-    public function getUserProfile($userId) {
-        return $this->find()->where(['user_id' => $userId])->first();
-    }
-
-    public function createProfile($userId) {
-        if (!$this->userHasProfile($userId) && $this->Users->isUserId($userId)) {
-            $profile = $this->newEntity(['user_id' => $userId]);
-            return $this->save($profile);
-        }
-        return false;
-    }
-
 }

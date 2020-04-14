@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace MakvilleAcl\Model\Table;
 
@@ -10,28 +11,30 @@ use Cake\Validation\Validator;
 /**
  * UserRoles Model
  *
- * @property \Cake\ORM\Association\BelongsTo $Users
- * @property \Cake\ORM\Association\BelongsTo $Roles
+ * @property \MakvilleAcl\Model\Table\UsersTable&\Cake\ORM\Association\BelongsTo $Users
+ * @property \MakvilleAcl\Model\Table\RolesTable&\Cake\ORM\Association\BelongsTo $Roles
  *
- * @method \Acl\Model\Entity\UserRole get($primaryKey, $options = [])
- * @method \Acl\Model\Entity\UserRole newEntity($data = null, array $options = [])
- * @method \Acl\Model\Entity\UserRole[] newEntities(array $data, array $options = [])
- * @method \Acl\Model\Entity\UserRole|bool save(\Cake\Datasource\EntityInterface $entity, $options = [])
- * @method \Acl\Model\Entity\UserRole patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
- * @method \Acl\Model\Entity\UserRole[] patchEntities($entities, array $data, array $options = [])
- * @method \Acl\Model\Entity\UserRole findOrCreate($search, callable $callback = null)
+ * @method \MakvilleAcl\Model\Entity\UserRole get($primaryKey, $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserRole newEntity($data = null, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserRole[] newEntities(array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserRole|false save(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserRole saveOrFail(\Cake\Datasource\EntityInterface $entity, $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserRole patchEntity(\Cake\Datasource\EntityInterface $entity, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserRole[] patchEntities($entities, array $data, array $options = [])
+ * @method \MakvilleAcl\Model\Entity\UserRole findOrCreate($search, callable $callback = null, $options = [])
  *
  * @mixin \Cake\ORM\Behavior\TimestampBehavior
  */
-class UserRolesTable extends Table {
-
+class UserRolesTable extends Table
+{
     /**
      * Initialize method
      *
      * @param array $config The configuration for the Table.
      * @return void
      */
-    public function initialize(array $config): void {
+    public function initialize(array $config): void
+    {
         parent::initialize($config);
 
         $this->setTable('user_roles');
@@ -42,11 +45,11 @@ class UserRolesTable extends Table {
 
         $this->belongsTo('Users', [
             'foreignKey' => 'user_id',
-            'className' => 'Acl.Users'
+            'className' => 'MakvilleAcl.Users',
         ]);
         $this->belongsTo('Roles', [
             'foreignKey' => 'role_id',
-            'className' => 'Acl.Roles'
+            'className' => 'MakvilleAcl.Roles',
         ]);
     }
 
@@ -56,14 +59,15 @@ class UserRolesTable extends Table {
      * @param \Cake\Validation\Validator $validator Validator instance.
      * @return \Cake\Validation\Validator
      */
-    public function validationDefault(Validator $validator): Validator {
+    public function validationDefault(Validator $validator): Validator
+    {
         $validator
-                ->integer('id')
-                ->allowEmpty('id', 'create');
+            ->integer('id')
+            ->allowEmptyString('id', null, 'create');
 
         $validator
-                ->integer('assigned_by')
-                ->allowEmpty('assigned_by');
+            ->integer('assigned_by')
+            ->allowEmptyString('assigned_by');
 
         return $validator;
     }
@@ -75,22 +79,11 @@ class UserRolesTable extends Table {
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
-    public function buildRules(RulesChecker $rules): RulesChecker {
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
         $rules->add($rules->existsIn(['user_id'], 'Users'));
         $rules->add($rules->existsIn(['role_id'], 'Roles'));
 
         return $rules;
     }
-
-    public function getUsersRoles($userId, $list = false) {
-        if ($list) {
-            return $this->find('list', ['keyField' => 'id', 'valueField' => 'role_id'])->where(['user_id' => $userId]);
-        }
-        return $this->find()->where(['user_id' => $userId]);
-    }
-
-    public function purgeUsersRoles($userId) {
-        return $this->deleteAll(['user_id' => $userId]);
-    }
-
 }

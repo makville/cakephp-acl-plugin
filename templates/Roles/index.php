@@ -1,40 +1,56 @@
 <?php
-
-$this->start('page_header');?>
-<h2>Access control roles</h2>
-<em> roles allocatable to users</em>
-<?php
-$this->end();
+/**
+ * @var \App\View\AppView $this
+ * @var \Cake\Datasource\EntityInterface[]|\Cake\Collection\CollectionInterface $roles
+ */
 ?>
-<div class="widget widget-table">
-    <div class="widget-header">
-        <h3><i class="fa fa-edit"></i> Access control roles</h3> <em> - roles allocatable to users</em>
-        <?= $this->Html->link('<i class="fa fa-plus"></i> New role', ['action' => 'add'], ['escape' => false, 'class' => 'btn btn-sm btn-info pull-right widget-header-link']); ?>
-    </div>
-    <div class="widget-content">
-        <div id="featured-datatable_wrapper" class="dataTables_wrapper form-inline no-footer">
-            <table id="featured-datatable" class="table table-sorting table-striped table-hover datatable dataTable no-footer" role="grid" aria-describedby="featured-datatable_info">
-                <thead>
-                    <tr role="row">
-                        <th class="sorting_asc" tabindex="0" aria-controls="featured-datatable" rowspan="1" colspan="1" aria-sort="ascending" aria-label="">Name</th>
-                        <th class="sorting" tabindex="0" aria-controls="featured-datatable" rowspan="1" colspan="1" aria-label="">Description</th>
-                        <th class="sorting" tabindex="0" aria-controls="featured-datatable" rowspan="1" colspan="1" aria-label=""></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($aclRoles as $aclRole): ?>
-                    <tr>
-                        <td><?= h($aclRole->name) ?></td>
-                        <td><?= h($aclRole->description) ?></td>
-                        <td class="actions">
-                            <?= $this->Html->link(__('View'), ['action' => 'view', $aclRole->id], ['class' => 'btn btn-xs btn-info']) ?>
-                            <?= $this->Html->link(__('Edit'), ['action' => 'edit', $aclRole->id], ['class' => 'btn btn-xs btn-warning']) ?>
-                            <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $aclRole->id], ['class' => 'btn btn-xs btn-danger'], ['confirm' => __('Are you sure you want to delete # {0}?', $aclRole->id)]) ?>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+<div class="row">
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="card-body">
+                <h5 class="card-title">Roles</h5>
+                <hr />
+                <div class="table-responsive">
+                    <table class="mb-0 table">
+                        <thead>
+                            <tr>
+                                <th><?= $this->Paginator->sort('id') ?></th>
+                                <th><?= $this->Paginator->sort('name') ?></th>
+                                <th><?= $this->Paginator->sort('description') ?></th>
+                                <th><?= $this->Paginator->sort('created') ?></th>
+                                <th><?= $this->Paginator->sort('modified') ?></th>
+                                <th class="actions"><?= __('Actions') ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($roles as $role): ?>
+                                <tr>
+                                    <td><?= $this->Number->format($role->id) ?></td>
+                                    <td><?= h($role->name) ?></td>
+                                    <td><?= h($role->description) ?></td>
+                                    <td><?= h($role->created->timeAgoInWords()) ?></td>
+                                    <td><?= h($role->modified->timeAgoInWords()) ?></td>
+                                    <td class="actions">
+                                        <?= $this->Html->link(__('View'), ['action' => 'view', $role->id], ['class' => 'btn btn-sm btn-info']) ?>
+                                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $role->id], ['class' => 'btn btn-sm btn-warning']) ?>
+                                        <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $role->id], ['confirm' => __('Are you sure you want to delete this role'), 'class' => 'btn btn-sm btn-danger']) ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="paginator">
+                    <ul class="pagination">
+                        <?= $this->Paginator->first('<< ' . __('first')) ?>
+                        <?= $this->Paginator->prev('< ' . __('previous')) ?>
+                        <?= $this->Paginator->numbers() ?>
+                        <?= $this->Paginator->next(__('next') . ' >') ?>
+                        <?= $this->Paginator->last(__('last') . ' >>') ?>
+                    </ul>
+                    <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
+                </div>
+            </div>
         </div>
     </div>
 </div>

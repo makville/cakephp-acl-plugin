@@ -1,44 +1,78 @@
-<?php /**/ ?>
-<div class="actions columns large-2 medium-3">
-    <h3><?= __('Actions') ?></h3>
-    <ul class="side-nav">
-        <li><?= $this->Html->link(__('New Acl Module'), ['action' => 'add']) ?></li>
-        <li><?= $this->Html->link(__('List Acl Module Action Groups'), ['controller' => 'AclModuleActionGroups', 'action' => 'index']) ?></li>
-        <li><?= $this->Html->link(__('New Acl Module Action Group'), ['controller' => 'AclModuleActionGroups', 'action' => 'add']) ?></li>
-    </ul>
-</div>
-<div class="aclModules index large-10 medium-9 columns">
-    <table cellpadding="0" cellspacing="0">
-    <thead>
-        <tr>
-            <th><?= $this->Paginator->sort('id') ?></th>
-            <th><?= $this->Paginator->sort('name') ?></th>
-            <th><?= $this->Paginator->sort('handle') ?></th>
-            <th class="actions"><?= __('Actions') ?></th>
-        </tr>
-    </thead>
-    <tbody>
-    <?php foreach ($aclModules as $aclModule): ?>
-        <tr>
-            <td><?= $this->Number->format($aclModule->id) ?></td>
-            <td><?= h($aclModule->name) ?></td>
-            <td><?= h($aclModule->handle) ?></td>
-            <td class="actions">
-                <?= $this->Html->link(__('View'), ['action' => 'view', $aclModule->id]) ?>
-                <?= $this->Html->link(__('Edit'), ['action' => 'edit', $aclModule->id]) ?>
-                <?= $this->Form->postLink(__('Delete'), ['action' => 'delete', $aclModule->id], ['confirm' => __('Are you sure you want to delete # {0}?', $aclModule->id)]) ?>
-            </td>
-        </tr>
+<?php
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+$configured = [];
+?>
 
-    <?php endforeach; ?>
-    </tbody>
-    </table>
-    <div class="paginator">
-        <ul class="pagination">
-            <?= $this->Paginator->prev('< ' . __('previous')) ?>
-            <?= $this->Paginator->numbers() ?>
-            <?= $this->Paginator->next(__('next') . ' >') ?>
-        </ul>
-        <p><?= $this->Paginator->counter() ?></p>
+<div class="row">
+    <div class="col-md-12">
+        <div class="main-card mb-3 card">
+            <div class="card-body">
+                <h5 class="card-title">Module setup</h5>
+                <hr />
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <h5 class="card-title">Configured</h5>
+                            <hr />
+                            <div class="scroll-area-lg">
+                                <div class="scrollbar-container ps--active-y ps">
+                                    <ul class="list-group" style="list-style: none;">
+                                        <?php 
+                                            foreach ($modules as $module): 
+                                                $configured[] = $module->name;
+                                        ?>
+                                            <li class="list-group-item">
+                                                <h5 class="list-group-item-heading"><?= $module->name; ?></h5>
+                                                <p class="list-group-item-text">
+                                                    <?= $module->description; ?> 
+                                                    <?= $this->Form->postLink('Remove', ['action' => 'delete', $module->id], ['class' => 'pull-right btn btn-sm btn-danger', 'confirm' => 'Are you sure you want to remove this module?']);?>
+                                                    <span class="pull-right">&nbsp;</span>
+                                                    <?= $this->Html->link('Update', ['action' => 'update', $module->id], ['class' => 'pull-right btn btn-sm btn-warning']);?>
+                                                    <span class="pull-right">&nbsp;</span>
+                                                    <?= $this->Html->link('Details', ['action' => 'details', $module->id], ['class' => 'pull-right btn btn-sm btn-info']);?>
+                                                </p>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-body">
+                            <h5 class="card-title">Available</h5>
+                            <hr />
+                            <div class="scroll-area-lg">
+                                <div class="scrollbar-container ps--active-y ps">
+                                    <ul class="list-group" style="list-style: none;">
+                                        <?php 
+                                        foreach (Cake\Core\Plugin::loaded() as $plugin): 
+                                            //does this plugin conform to acl requirements?
+                                            $dutiesConfigPath = Cake\Core\Plugin::configPath($plugin) . "/duties.json";
+                                            if (file_exists($dutiesConfigPath)):
+                                                $dutiesConfiguration = json_decode(file_get_contents($dutiesConfigPath), true);
+                                                if (in_array($dutiesConfiguration['name'], $configured)) { continue; }
+                                        ?>
+                                        
+                                            <li class="list-group-item">
+                                                <h5 class="list-group-item-heading"><?= $plugin; ?></h5>
+                                                <p class="list-group-item-text"><?= $dutiesConfiguration['description']; ?> <?= $this->Html->link('Setup', ['action' => 'setup', $plugin], ['class' => 'pull-right btn btn-sm btn-warning']);?><span class="pull-right">&nbsp;</span><?= $this->Html->link('Details', ['action' => 'readme', $plugin], ['class' => 'pull-right btn btn-sm btn-info']);?></p>
+                                            </li>
+                                        <?php 
+                                            endif;
+                                        endforeach; 
+                                        ?>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
